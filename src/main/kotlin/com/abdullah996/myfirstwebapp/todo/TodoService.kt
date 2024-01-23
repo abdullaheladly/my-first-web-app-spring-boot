@@ -18,8 +18,8 @@ class TodoService {
             todos.add(Todo(++todosCount,"abdullah","learn hypernate", LocalDate.now().plusYears(1),false))
         }
     }
-    fun getTodosList():List<Todo>{
-        return todos.toList()
+    fun getTodosList(name:String):List<Todo>{
+        return todos.filter { it.userName.equals(name,ignoreCase = true) }
     }
 
     fun addTodo(userName:String,desc:String,localDate: LocalDate,isDone:Boolean){

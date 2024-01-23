@@ -1,6 +1,7 @@
 package com.abdullah996.myfirstwebapp.todo
 
 import jakarta.validation.Valid
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Controller
 import org.springframework.ui.ModelMap
 import org.springframework.validation.BindingResult
@@ -15,8 +16,13 @@ class TodoController constructor(private  val todoService: TodoService) {
 
     @RequestMapping("list-todo")
     fun listAllTodos(modelMap: ModelMap):String{
-        modelMap.addAttribute("todos",todoService.getTodosList())
+        modelMap.addAttribute("todos",todoService.getTodosList(getLoginUserName()))
         return "listTodos"
+    }
+
+
+    fun getLoginUserName():String{
+        return SecurityContextHolder.getContext().authentication.name
     }
 
     @RequestMapping("delete-todo")
@@ -26,7 +32,7 @@ class TodoController constructor(private  val todoService: TodoService) {
     }
     @RequestMapping("update-todo",method = [RequestMethod.GET])
     fun showUpdateTodoPage(@RequestParam id:Int,modelMap: ModelMap):String{
-        val username=modelMap.getAttribute("name").toString()
+        val username=getLoginUserName()
         val todo=todoService.findById(id)
         modelMap.put("todo",todo)
         return "todo"
@@ -37,7 +43,7 @@ class TodoController constructor(private  val todoService: TodoService) {
         if (result.hasErrors()){
             return "todo"
         }
-        val username=modelMap.getAttribute("name").toString()
+        val username=getLoginUserName()
 
         val updatedTodo=todo.copy(userName =username )
         todoService.updateTodo(updatedTodo)
@@ -46,7 +52,7 @@ class TodoController constructor(private  val todoService: TodoService) {
 
     @RequestMapping("add-todo", method = [RequestMethod.GET])
     fun showNewTodoPage(modelMap: ModelMap):String{
-        val username=modelMap.getAttribute("name").toString()
+        val username=getLoginUserName()
 
         val todo=Todo(0,username,"", LocalDate.now().plusYears(1),false)
         modelMap.put("todo",todo)
@@ -57,7 +63,7 @@ class TodoController constructor(private  val todoService: TodoService) {
         if (result.hasErrors()){
             return "todo"
         }
-        val username=modelMap.getAttribute("name").toString()
+        val username=getLoginUserName()
         todoService.addTodo(username,todo.desc, todo.targetDate,false)
         return "redirect:list-todo"
     }
