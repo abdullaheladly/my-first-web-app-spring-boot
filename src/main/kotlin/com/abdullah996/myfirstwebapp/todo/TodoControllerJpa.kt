@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 
 
-//@Controller
+@Controller
 @SessionAttributes("name")
-class TodoController constructor(private  val todoService: TodoService) {
+class TodoControllerJpa constructor(private val todoRepository: TodoRepository) {
 
     @RequestMapping("list-todo")
     fun listAllTodos(modelMap: ModelMap):String{
-        modelMap.addAttribute("todos",todoService.getTodosList(getLoginUserName()))
+
+        modelMap.addAttribute("todos",todoRepository.findByUserName(getLoginUserName()))
         return "listTodos"
     }
 
@@ -27,13 +28,13 @@ class TodoController constructor(private  val todoService: TodoService) {
 
     @RequestMapping("delete-todo")
     fun listAllTodos(@RequestParam id:Int):String{
-        todoService.deleteTodo(id)
+        todoRepository.deleteById(id)
         return "redirect:list-todo"
     }
     @RequestMapping("update-todo",method = [RequestMethod.GET])
     fun showUpdateTodoPage(@RequestParam id:Int,modelMap: ModelMap):String{
         val username=getLoginUserName()
-        val todo=todoService.findById(id)
+        val todo=todoRepository.findById(id).get()
         modelMap.put("todo",todo)
         return "todo"
     }
@@ -46,7 +47,7 @@ class TodoController constructor(private  val todoService: TodoService) {
         val username=getLoginUserName()
 
         val updatedTodo=todo.copy(userName =username )
-        todoService.updateTodo(updatedTodo)
+        todoRepository.save(updatedTodo)
         return "redirect:list-todo"
     }
 
@@ -54,7 +55,7 @@ class TodoController constructor(private  val todoService: TodoService) {
     fun showNewTodoPage(modelMap: ModelMap):String{
         val username=getLoginUserName()
 
-        val todo=Todo(0,username,"", LocalDate.now().plusYears(1),false)
+        val todo=Todo(userName = username, desc = "", targetDate =  LocalDate.now().plusYears(1), done = false)
         modelMap.put("todo",todo)
         return "todo"
     }
@@ -64,7 +65,7 @@ class TodoController constructor(private  val todoService: TodoService) {
             return "todo"
         }
         val username=getLoginUserName()
-        todoService.addTodo(username,todo.desc, todo.targetDate,false)
+        todoRepository.save(todo.copy(userName = username))
         return "redirect:list-todo"
     }
 }

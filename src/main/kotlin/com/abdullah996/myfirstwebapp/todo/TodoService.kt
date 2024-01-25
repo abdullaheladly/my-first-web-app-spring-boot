@@ -13,7 +13,7 @@ class TodoService {
         private var todosCount=0
         init {
             todos.add(Todo(++todosCount,"abdullah","learn spring", LocalDate.now().plusYears(1),false))
-            todos.add(Todo(++todosCount,"abdullah","learn AWS", LocalDate.now().plusYears(1),false))
+            todos.add(Todo(++todosCount,"ahmed","learn AWS", LocalDate.now().plusYears(1),false))
             todos.add(Todo(++todosCount,"abdullah","learn Jsp", LocalDate.now().plusYears(1),false))
             todos.add(Todo(++todosCount,"abdullah","learn hypernate", LocalDate.now().plusYears(1),false))
         }
